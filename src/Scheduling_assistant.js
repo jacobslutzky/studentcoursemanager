@@ -4,17 +4,27 @@ import React from "react";
 import axios from "axios";
 import { useNavigate } from "react-router";
 
-export default function Current_courses(props) {
+export default function Scheduling_Assistant(props) {
+
     let navigate = useNavigate();
     const back = () => {
-        navigate("/summary")
+        navigate("/welcome")
     }
-    const add_course = () => {
-        
-        props.getAvailableCourses();
-        navigate("/add_course")
+    const add_course = (course_id) => {
+        axios.post("http://localhost:3000/add_course", {
+        student_id: props.student.student_id,
+        course_id: course_id,
+    })
     }
-    console.log(props.available_courses);
+    const getAvailableCourses = (student__id) => {
+        axios.get("http://localhost:3000/get_available_courses",  {
+            student_id: student__id, }).then((res) => {
+            props.setAvailableCourses(res.data);
+    });
+    };
+
+  
+
     return (
         <div className="App">
         <h1><b>Available Courses</b></h1> 
@@ -24,10 +34,11 @@ export default function Current_courses(props) {
        <div className="courseinfo">
           <h3>Course Number: {item.course_id}</h3>
           <h3>Course Name: {item.name}</h3>
-          <button onClick={add_course} >Add Course</button>
+          <button> Add Course</button>
        </div>
      );
     })}
+     <button onClick={back} >Back</button>
         </div>
     );
 
