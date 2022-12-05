@@ -1,45 +1,116 @@
 import "./App.css";
+import { useState, useEffect, useContext } from "react";
 import React from "react";
-import { useForm } from "react-hook-form";
 import axios from "axios";
+import { useNavigate } from "react-router";
+
 
 export default function Login(props) {
-  const { register, handleSubmit } = useForm();
-  const onSubmit = (data) => {
-        console.log(data);
-        addStudent(data);
-      };
-     // function to make a POST req to the server to insert data to MySQL db
-    const addStudent = (data) => {
-      axios.post("http://localhost:3000/studentsinfo", data).then(() => {
-        // 4.
-        props.setStudents([
-            ...props.studentsinfo, {data}]);
-      });
-    };
+  let navigate = useNavigate();
+  const [nameReg, setNameReg] = useState("");
+  const [majorReg, setMajorReg] = useState("");
+  const [yearReg, setYearReg] = useState("");
+  const [passwordReg, setPasswordReg] = useState("");
+
+  
+  const [loginStatus, setLoginStatus] = useState("");
+
+  axios.defaults.withCredentials = true;
+
+  const register = () => {
+    axios.post("http://localhost:3000/register", {
+      name: nameReg,
+      year: yearReg,
+      major: majorReg,
+      password: passwordReg,
+    }).then((response) => {
+      console.log(response);
+      props.setStudentID(response.data[0].student_id)
+      props.setPassword(response.data[0].password)
+      props.setMajor(response.data[0].major);
+      props.setName(response.data[0].name);
+      props.setYear(response.data[0].year)
+  });
+
+  navigate("/welcome")
+
+  };
+
+  const login = () => {
+    axios.post("http://localhost:3000/login_student", {
+      student_id: props.student_id,
+      password: props.password,
+    }).then((response) => {
+      if (response.data.message) {
+        
+      } else {
+        props.setMajor(response.data[0].major);
+        props.setName(response.data[0].name);
+        props.setYear(response.data[0].year)
+        navigate("/welcome")
+      }
+    });
+    
+  };
+
+
 
   return (
-    <form className="login-student" onSubmit={handleSubmit(onSubmit)}>
-            <h4>Login Student</h4>
-             <input {...register("name")}
-              type="text"
-              placeholder="Student Name"
-              name="name"
-              
-            />
-            <input {...register("major")}
-              type="text"
-              placeholder="Student Major"
-              name="major"
-            />
-            <input {...register("class")}
-              type="text"
-              placeholder="Student Class"
-              name="class"
-            />
-      
-            <input id="btn" type="submit" />
-          </form>
-)
+ 
+    <div className="App">
+      <div className="registration">
+        <h1>Registration</h1>
+        <label>Name</label>
+        <input
+          type="text"
+          onChange={(e) => {
+            setNameReg(e.target.value);
+          }}
+        />
+        <label>Major</label>
+        <input
+          type="text"
+          onChange={(e) => {
+            setMajorReg(e.target.value);
+          }}
+        />
+        <label>Class</label>
+        <input
+          type="text"
+          onChange={(e) => {
+            setYearReg(e.target.value);
+          }}
+        />
+        <label>Password</label>
+        <input
+          type="text"
+          onChange={(e) => {
+            setPasswordReg(e.target.value);
+          }}
+        />
+        <button onClick={register}> Register </button>
+      </div>
+
+      <div className="login">
+        <h1>Login</h1>
+        <input
+          type="text"
+          placeholder="Student ID..."
+          onChange={(e) => {
+            props.setStudentID(e.target.value);
+          }}
+        />
+        <input
+          type="password"
+          placeholder="Password..."
+          onChange={(e) => {
+            props.setPassword(e.target.value);
+          }}
+        />
+        <button onClick={login}> Login </button>
+      </div>
+
+    </div>
+);
 
    }
