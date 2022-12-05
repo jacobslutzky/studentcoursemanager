@@ -16,12 +16,7 @@ export default function Scheduling_Assistant(props) {
         course_id: course_id,
     })
     }
-    const getAvailableCourses = (student__id) => {
-        axios.get("http://localhost:3000/get_available_courses",  {
-            student_id: student__id, }).then((res) => {
-            props.setAvailableCourses(res.data);
-    });
-    };
+    
 
   
 
