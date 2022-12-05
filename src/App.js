@@ -19,9 +19,9 @@ const [course_id, setCourseID] = useState("");
 const [available_courses, setAvailableCourses] = useState("");
 const [curr_courses, setCurrCourses] = useState("");
 
-const getAvailableCourses = (student__id) => {
+const getAvailableCourses = () => {
     axios.get("http://localhost:3000/get_available_courses",  {
-        student_id: student__id, }).then((res) => {
+        student_id: student.student_id }).then((res) => {
         setAvailableCourses(res.data);
 });
 };
