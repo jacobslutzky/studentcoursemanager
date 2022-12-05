@@ -12,8 +12,8 @@ export default function Summary(props) {
     return (
         <div className="App">
         <h1><b>Summary</b></h1> 
-        <h3> Name: {props.name} </h3> 
-        <h3>Student ID: {props.student_id} </h3> 
+        <h3> Name: {props.student.name} </h3> 
+        <h3>Student ID: {props.student.student_id} </h3> 
         <h3>GPA: </h3>
         <h3>Credits: </h3>
         <button onClick={back} >Back</button>

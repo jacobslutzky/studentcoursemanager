@@ -9,23 +9,28 @@ export default function Current_courses(props) {
     const back = () => {
         navigate("/welcome")
     }
-    const add_course = () => {
-        navigate("/add_course")
-    }
-    const drop_course = () => {
-        navigate("/drop_course")
-    }
+    // const drop_course = () => {
+    //     axios.delete("http://localhost:3000/drop_course", {
+    //     student_id: props.student_id,
+    //     course_id: item.course_id,
+    // })
+
+ //   }
 
     return (
         <div className="App">
         <h1><b>Current Courses</b></h1> 
-        <h3>Course Number:       Course Name:</h3> 
-        <h3>1                    Course1 </h3> 
-        <h3>2                    Course2 </h3>
         
-        <button onClick={add_course} >Add Course</button>
-        <button onClick={drop_course} >Drop Course</button>
-        <button onClick={back} >Back</button>
+        {props.curr_courses.map((item) => {
+    return (
+       <div className="courseinfo">
+          <h3>Course Number: {item.course_id}</h3>
+          <h3>Course Name: {item.name}</h3>
+          <button  >Drop course</button>
+       </div>
+     );
+    })}
+     <button onClick={back} >Back</button>
         </div>
     );
 

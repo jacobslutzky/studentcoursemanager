@@ -20,7 +20,7 @@ export default function Welcome(props) {
     }
     return (
         <div className="App">
-        <h1>Hello {props.name}!</h1> 
+        <h1>Hello {props.student.name}!</h1> 
         <button onClick={summary}> Summary </button>  {'\n'}
         <button onClick={curr_courses}>Current Courses </button>  {'\n'}
         <button onClick={scheduling_assistant}>Scheduling Assistant: </button>

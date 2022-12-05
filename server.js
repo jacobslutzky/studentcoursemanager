@@ -208,7 +208,8 @@ app.post("/login_student", (req, res) => {
 
 app.get("/get_available_courses", (req, res) => {
         db.query(
-            "select * from courses where course_id not in (select course_id from gradebook)",
+            "select * from courses where course_id not in (select course_id from gradebook where student_id = ?)",
+            [req.body.student_id],
             (err, result) => {
             if (err) {
                 console.log(err);
@@ -219,28 +220,48 @@ app.get("/get_available_courses", (req, res) => {
         );
         });
 
+app.get("/get_curr_courses", (req, res) => {
+    db.query(
+        "select * from courses where course_id not in (select course_id from gradebook where student_id = ? and final_grade = Null)",
+        [req.body.student_id],
+        (err, result) => {
+        if (err) {
+            console.log(err);
+        } else {
+            res.send(result);
+        }
+        }
+    );
+    });
 
 app.post("/add_course", (req, res) => {
-    const insertQuery = "INSERT INTO gradebook (student_id, course_id, final_grade, credits) VALUES (?,?, ?, ?)";
-    const name = req.body.name;
-    const password = req.body.password;
-    const major = req.body.major;
-    const year = req.body.year;
-    db.query(insertQuery, [name, password,major,year], (err, result) => {
+    const insertQuery = "INSERT INTO gradebook (student_id, course_id, final_grade) VALUES (?,?, Null)";
+    const student_id = req.body.student_id;
+    const course_id = req.body.course_id;
+    db.query(insertQuery, [student_id, course_id], (err, result) => {
         if (err) {
         console.log(err);
         } else {
-        db.query("select * from student_information where student_id = (select MAX(student_id) from student_information)", (err, result) => {
-        if (err) {
-            console.log(err);
-            } else {
-            res.send(result);
-        }
-    });
+        res.send(result);
         }
     });
     
 });
+
+app.delete("/drop_course", (req, res) => {
+    const deleteQuery = "delete from gradebook where student_id = ? and course_id = ?";
+    const student_id = req.params.student_id;
+    const course_id = req.params.course_id;
+    db.query(deleteQuery, [student_id, course_id], (err, result) => {
+        if (err) {
+        console.log(err);
+        } else {
+        res.send(result);
+        }
+    });
+    
+});
+
 // app.get("/get_gpa", (req, res) => {
         // db.query(
         //     "",

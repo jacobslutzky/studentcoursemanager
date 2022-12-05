@@ -11,7 +11,7 @@ export default function Login(props) {
   const [majorReg, setMajorReg] = useState("");
   const [yearReg, setYearReg] = useState("");
   const [passwordReg, setPasswordReg] = useState("");
-
+  const [studentIDReg, setStudentIDReg] = useState("");
   
   const [loginStatus, setLoginStatus] = useState("");
 
@@ -25,11 +25,8 @@ export default function Login(props) {
       password: passwordReg,
     }).then((response) => {
       console.log(response);
-      props.setStudentID(response.data[0].student_id)
-      props.setPassword(response.data[0].password)
-      props.setMajor(response.data[0].major);
-      props.setName(response.data[0].name);
-      props.setYear(response.data[0].year)
+      props.setStudent(response.data[0])
+      
   });
 
   navigate("/welcome")
@@ -38,15 +35,13 @@ export default function Login(props) {
 
   const login = () => {
     axios.post("http://localhost:3000/login_student", {
-      student_id: props.student_id,
-      password: props.password,
+      student_id: studentIDReg,
+      password: passwordReg,
     }).then((response) => {
       if (response.data.message) {
         
       } else {
-        props.setMajor(response.data[0].major);
-        props.setName(response.data[0].name);
-        props.setYear(response.data[0].year)
+        props.setStudent(response.data[0])
         navigate("/welcome")
       }
     });
@@ -97,14 +92,14 @@ export default function Login(props) {
           type="text"
           placeholder="Student ID..."
           onChange={(e) => {
-            props.setStudentID(e.target.value);
+            setStudentIDReg(e.target.value);
           }}
         />
         <input
           type="password"
           placeholder="Password..."
           onChange={(e) => {
-            props.setPassword(e.target.value);
+            setPasswordReg(e.target.value);
           }}
         />
         <button onClick={login}> Login </button>
