@@ -4,6 +4,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
+const { add } = require("nodemon/lib/rules");
 
 const app = express();
 
@@ -51,6 +52,54 @@ app.get('/createdb', (req, res) => {
     });
 });
 
+app.get('/create_student_info_table', (req, res) => {
+    db.query("CREATE TABLE student_information (student_id int primary key NOT NULL AUTO_INCREMENT, name VARCHAR(100), major VARCHAR(100), year VARCHAR(100),password VARCHAR(100))", (err,result) => {
+        if(err) throw err;
+        console.log(result);
+        res.send("table created...")
+    });
+});
+app.get('/create_gpa_info_table', (req, res) => {
+    db.query("CREATE TABLE gpa_information (student_id int primary key, gpa numeric)", (err,result) => {
+        if(err) throw err;
+        console.log(result);
+        res.send("table created...")
+    });
+});
+app.get('/create_gradebook', (req, res) => {
+    db.query("CREATE TABLE gradebook (student_id int , course_id VARCHAR(100), final_grade numeric, credits numeric, primary key(student_id,course_id))", (err,result) => {
+        if(err) throw err;
+        console.log(result);
+        res.send("table created...")
+    });
+});
+app.get('/create_course_table', (req, res) => {
+    db.query("CREATE TABLE courses (course_id int primary key, faculty_id int, name VARCHAR(100), description VARCHAR(100), average_rating VARCHAR(100))", (err,result) => {
+        if(err) throw err;
+        console.log(result);
+        res.send("table created...")
+    });
+});
+
+
+app.get('/create_review_table', (req, res) => {
+    db.query("CREATE TABLE reviews (course_id int primary key, date datetime, rating int)", (err,result) => {
+        if(err) throw err;
+        console.log(result);
+        res.send("table created...")
+    });
+});
+app.get('/create_teacher_table', (req, res) => {
+    db.query("CREATE TABLE teacher (faculty_id int primary key, name VARCHAR(100))", (err,result) => {
+        if(err) throw err;
+        console.log(result);
+        res.send("table created...")
+    });
+});
+
+
+
+
 app.get('/createstudentinfotable', (req, res) => {
     db.query("CREATE TABLE student_information (student_id int primary key NOT NULL AUTO_INCREMENT, name VARCHAR(100), major VARCHAR(100), year VARCHAR(100),password VARCHAR(100))", (err,result) => {
         if(err) throw err;
@@ -58,6 +107,7 @@ app.get('/createstudentinfotable', (req, res) => {
         res.send("Database created...")
     });
 });
+
 
 app.get('/delete', (req, res) => {
     db.query("Drop TABLE student_information ", (err,result) => {
@@ -156,3 +206,47 @@ app.post("/login_student", (req, res) => {
     
     
 });
+
+app.get("/get_available_courses", (req, res) => {
+        db.query(
+            "select * from courses where course_id not in (select course_id from gradebook)",
+            (err, result) => {
+            if (err) {
+                console.log(err);
+            } else {
+                res.send(result);
+            }
+            }
+        );
+        });
+//TODO
+// app.post("/add_course", (req, res) => {
+//     db.query(
+//         "INSERT INTO student_information (name, password, major, year) VALUES (?,?, ?, ?)",
+//         req.params.student_id,
+//         (err, result) => {
+//         if (err) {
+//             console.log(err);
+//         } else {
+//             res.send(result);
+//         }
+//         }
+//     );
+//     });
+
+// app.get("/get_gpa", (req, res) => {
+        // db.query(
+        //     "",
+        //     req.params.student_id,
+        //     (err, result) => {
+        //     if (err) {
+        //         console.log(err);
+        //     } else {
+        //         res.send(result);
+        //     }
+        //     }
+        // );
+        // });
+
+
+
