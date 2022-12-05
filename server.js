@@ -4,7 +4,6 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
-const { add } = require("nodemon/lib/rules");
 
 const app = express();
 
@@ -59,22 +58,22 @@ app.get('/create_student_info_table', (req, res) => {
         res.send("table created...")
     });
 });
-app.get('/create_gpa_info_table', (req, res) => {
-    db.query("CREATE TABLE gpa_information (student_id int primary key, gpa numeric)", (err,result) => {
-        if(err) throw err;
-        console.log(result);
-        res.send("table created...")
-    });
-});
+// app.get('/create_gpa_info_table', (req, res) => {
+//     db.query("CREATE TABLE gpa_information (student_id int primary key, gpa numeric)", (err,result) => {
+//         if(err) throw err;
+//         console.log(result);
+//         res.send("table created...")
+//     });
+// });
 app.get('/create_gradebook', (req, res) => {
-    db.query("CREATE TABLE gradebook (student_id int , course_id VARCHAR(100), final_grade numeric, credits numeric, primary key(student_id,course_id))", (err,result) => {
+    db.query("CREATE TABLE gradebook (student_id int , course_id VARCHAR(100), final_grade numeric, primary key(student_id,course_id))", (err,result) => {
         if(err) throw err;
         console.log(result);
         res.send("table created...")
     });
 });
 app.get('/create_course_table', (req, res) => {
-    db.query("CREATE TABLE courses (course_id int primary key, faculty_id int, name VARCHAR(100), description VARCHAR(100), average_rating VARCHAR(100))", (err,result) => {
+    db.query("CREATE TABLE courses (course_id int primary key, faculty_id int, name VARCHAR(100), description VARCHAR(100), credits numeric)", (err,result) => {
         if(err) throw err;
         console.log(result);
         res.send("table created...")
@@ -219,21 +218,29 @@ app.get("/get_available_courses", (req, res) => {
             }
         );
         });
-//TODO
-// app.post("/add_course", (req, res) => {
-//     db.query(
-//         "INSERT INTO student_information (name, password, major, year) VALUES (?,?, ?, ?)",
-//         req.params.student_id,
-//         (err, result) => {
-//         if (err) {
-//             console.log(err);
-//         } else {
-//             res.send(result);
-//         }
-//         }
-//     );
-//     });
 
+
+app.post("/add_course", (req, res) => {
+    const insertQuery = "INSERT INTO gradebook (student_id, course_id, final_grade, credits) VALUES (?,?, ?, ?)";
+    const name = req.body.name;
+    const password = req.body.password;
+    const major = req.body.major;
+    const year = req.body.year;
+    db.query(insertQuery, [name, password,major,year], (err, result) => {
+        if (err) {
+        console.log(err);
+        } else {
+        db.query("select * from student_information where student_id = (select MAX(student_id) from student_information)", (err, result) => {
+        if (err) {
+            console.log(err);
+            } else {
+            res.send(result);
+        }
+    });
+        }
+    });
+    
+});
 // app.get("/get_gpa", (req, res) => {
         // db.query(
         //     "",
