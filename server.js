@@ -72,6 +72,7 @@ app.get('/create_gradebook', (req, res) => {
         res.send("table created...")
     });
 });
+
 app.get('/create_course_table', (req, res) => {
     db.query("CREATE TABLE courses (course_id int primary key, faculty_id int, name VARCHAR(100), description VARCHAR(100), credits numeric)", (err,result) => {
         if(err) throw err;
@@ -206,10 +207,10 @@ app.post("/login_student", (req, res) => {
     
 });
 
-app.get("/get_available_courses", (req, res) => {
+app.post("/get_available_courses", (req, res) => {
         db.query(
-            "select * from courses where course_id not in (select course_id from gradebook where student_id = ?)",
-            [req.body.student_id],
+            "select * from courses where course_id not in (select course_id from gradebook where student_id = ?) and course_id LIKE concat(?,'%')",
+            [req.body.student_id, req.body.course_subname],
             (err, result) => {
             if (err) {
                 console.log(err);
@@ -219,10 +220,11 @@ app.get("/get_available_courses", (req, res) => {
             }
         );
         });
+    //"select * from courses where course_id not in (select course_id from gradebook where student_id = ? and final_grade = Null)"
 
-app.get("/get_curr_courses", (req, res) => {
+app.post("/get_curr_courses", (req, res) => {
     db.query(
-        "select * from courses where course_id not in (select course_id from gradebook where student_id = ? and final_grade = Null)",
+        "select * from gradebook where student_id = ?",
         [req.body.student_id],
         (err, result) => {
         if (err) {
@@ -235,7 +237,7 @@ app.get("/get_curr_courses", (req, res) => {
     });
 
 app.post("/add_course", (req, res) => {
-    const insertQuery = "INSERT INTO gradebook (student_id, course_id, final_grade) VALUES (?,?, Null)";
+    const insertQuery = "INSERT INTO gradebook (student_id, course_id, final_grade) VALUES (?,?, 0)";
     const student_id = req.body.student_id;
     const course_id = req.body.course_id;
     db.query(insertQuery, [student_id, course_id], (err, result) => {
@@ -250,8 +252,9 @@ app.post("/add_course", (req, res) => {
 
 app.delete("/drop_course", (req, res) => {
     const deleteQuery = "delete from gradebook where student_id = ? and course_id = ?";
-    const student_id = req.params.student_id;
-    const course_id = req.params.course_id;
+    console.log(req.params, req.body)
+    const student_id = req.body.student_id;
+    const course_id = req.body.course_id;
     db.query(deleteQuery, [student_id, course_id], (err, result) => {
         if (err) {
         console.log(err);
