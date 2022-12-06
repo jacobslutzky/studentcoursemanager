@@ -9,13 +9,14 @@ export default function Current_courses(props) {
     const back = () => {
         navigate("/welcome")
     }
-    // const drop_course = () => {
-    //     axios.delete("http://localhost:3000/drop_course", {
-    //     student_id: props.student_id,
-    //     course_id: item.course_id,
-    // })
-
- //   }
+     const drop_course = (course_id) => {
+         axios.delete("http://localhost:3000/drop_course", {
+         data:{student_id: props.student_id,
+         course_id: course_id},
+     })
+     props.getAvailableCourses()
+    props.getCurrCourses()
+    }
 
     return (
         <div className="App">
@@ -23,10 +24,10 @@ export default function Current_courses(props) {
         
         {props.curr_courses.map((item) => {
     return (
-       <div className="courseinfo">
+       <div key = {item.course_id} className="courseinfo">
           <h3>Course Number: {item.course_id}</h3>
           <h3>Course Name: {item.name}</h3>
-          <button  >Drop course</button>
+          <button onClick = {() => drop_course(item.course_id)} >Drop Course</button>
        </div>
      );
     })}
