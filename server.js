@@ -129,6 +129,8 @@ app.get("/studentsinfo", (req,res) => {
       });
     });
 
+
+
 app.post("/register", (req, res) => {
     const insertQuery = "INSERT INTO student_information (name, password, major, year) VALUES (?,?, ?, ?)";
     const name = req.body.name;
@@ -221,6 +223,51 @@ app.post("/get_available_courses", (req, res) => {
         );
         });
     //"select * from courses where course_id not in (select course_id from gradebook where student_id = ? and final_grade = Null)"
+
+app.post("/get_selected_course", (req, res) => {
+    db.query(
+        "select * from gradebook where student_id = ? and course_id = ?",
+        [req.body.student_id, req.body.course_id],
+        (err, result) => {
+            if (err) {
+                console.log(err);
+            } else {
+                res.send(result);
+            }
+        }
+    )
+});
+
+app.post("/get_all_reviews", (req, res) => {
+    db.query(
+        "select * from reviews",
+        (err, result) => {
+            if (err) {
+                console.log(err);
+            } else {
+                console.log(result);
+                res.send(result);
+            }
+        }
+    )
+
+})
+
+app.post("/add_review", (req, res) => {
+        const insertQuery = "INSERT INTO reviews (course_id, date, rating) VALUES (?,?,?)";
+        const course_id = req.body.data.course_id;
+        const date = req.body.data.date;
+        const rating = req.body.data.rating;
+        console.log(date)
+        db.query(insertQuery, [course_id, date, rating], (err, result) => {
+            if (err) {
+                console.log(err);
+                } else {
+                res.send(result);
+                }
+        });
+
+    });
 
 app.post("/get_curr_courses", (req, res) => {
     db.query(

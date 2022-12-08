@@ -18,6 +18,10 @@ export default function Welcome(props) {
     const scheduling_assistant = () => {
         navigate("/scheduling_assistant")
     }
+    const reviewpage = () => {
+        navigate("/Reviews")
+    }
+
     const loginscrn = () => {
         navigate("/")
     }
@@ -28,6 +32,7 @@ export default function Welcome(props) {
         <button onClick={summary}> Summary </button>  {'\n'}
         <button onClick={curr_courses}>Current Courses </button>  {'\n'}
         <button onClick={scheduling_assistant}>Scheduling Assistant: </button>
+        <button onClick={reviewpage}>See all Course Reviews </button>
         <button onClick={loginscrn}>Go Back: </button>
         </div>
     );
