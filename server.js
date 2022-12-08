@@ -74,7 +74,7 @@ app.get('/create_gradebook', (req, res) => {
 });
 
 app.get('/create_course_table', (req, res) => {
-    db.query("CREATE TABLE courses (course_id int primary key, faculty_id int, name VARCHAR(100), description VARCHAR(100), credits numeric)", (err,result) => {
+    db.query("CREATE TABLE courses (course_id VARCHAR(100) primary key, faculty_id int, name VARCHAR(100), description VARCHAR(100), credits numeric)", (err,result) => {
         if(err) throw err;
         console.log(result);
         res.send("table created...")
@@ -83,7 +83,7 @@ app.get('/create_course_table', (req, res) => {
 
 
 app.get('/create_review_table', (req, res) => {
-    db.query("CREATE TABLE reviews (course_id int primary key, date datetime, rating int)", (err,result) => {
+    db.query("CREATE TABLE reviews (course_id VARCHAR(100) primary key, date VARCHAR(1000), rating numeric)", (err,result) => {
         if(err) throw err;
         console.log(result);
         res.send("table created...")
