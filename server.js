@@ -211,7 +211,7 @@ app.post("/login_student", (req, res) => {
 
 app.post("/get_available_courses", (req, res) => {
         db.query(
-            "select * from courses where course_id not in (select course_id from gradebook where student_id = ?) and course_id LIKE concat(?,'%')",
+            "select * from courses where course_id not in (select course_id from gradebook where student_id = ? and final_grade is NULL) and course_id LIKE concat(?,'%')",
             [req.body.student_id, req.body.course_subname],
             (err, result) => {
             if (err) {
@@ -271,7 +271,7 @@ app.post("/add_review", (req, res) => {
 
 app.post("/get_curr_courses", (req, res) => {
     db.query(
-        "select * from gradebook where student_id = ?",
+        "select * from gradebook where student_id = ? and final_grade is null",
         [req.body.student_id],
         (err, result) => {
         if (err) {
@@ -283,8 +283,10 @@ app.post("/get_curr_courses", (req, res) => {
     );
     });
 
+
+
 app.post("/add_course", (req, res) => {
-    const insertQuery = "INSERT INTO gradebook (student_id, course_id, final_grade) VALUES (?,?, 0)";
+    const insertQuery = "INSERT INTO gradebook (student_id, course_id, final_grade) VALUES (?,?, NULL)";
     const student_id = req.body.student_id;
     const course_id = req.body.course_id;
     db.query(insertQuery, [student_id, course_id], (err, result) => {
@@ -309,7 +311,32 @@ app.delete("/drop_course", (req, res) => {
         res.send(result);
         }
     });
-    
+});
+app.post("/finish_course", (req, res) => {
+    const updateQuery = "update gradebook set final_grade = ? where student_id = ? and course_id = ?";
+    //console.log(req.params, req.body)
+    const final_grade = req.body.data.final_grade;
+    const student_id = req.body.data.student_id;
+    const course_id = req.body.data.course_id;
+    db.query(updateQuery, [final_grade, student_id, course_id], (err, result) => {
+        if (err) {
+        console.log(err);
+        } else {
+        res.send(result);
+        }
+    });
+});
+app.post("/finished_courses", (req, res) => {
+    const getQuery = "select * from gradebook where final_grade is not null and student_id = ?";
+    console.log(req.params, req.body)
+    const student_id = req.body.student_id;
+    db.query(getQuery, [student_id], (err, result) => {
+        if (err) {
+        console.log(err);
+        } else {
+        res.send(result);
+        }
+    });
 });
 
 // app.get("/get_gpa", (req, res) => {

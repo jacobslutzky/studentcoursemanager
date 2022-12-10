@@ -11,16 +11,16 @@ export default function WriteReviews(props) {
     let navigate = useNavigate();
     const { course_id } = useParams();
     const location = useLocation();
+    props.setGrade(100)
+    props.setRating(1)
 
-
-
-    const next = (courseId, date, rating) => {
+    const next = (courseId, date, rating,final_grade) => {
         console.log(date);
         axios.post("http://localhost:3000/add_review", {
           data: { course_id: courseId, date: date, rating: rating },
         });
-        axios.delete("http://localhost:3000/drop_course", {
-         data:{student_id: location.state.student_id,
+        axios.post("http://localhost:3000/finish_course", {
+         data:{final_grade: final_grade, student_id: location.state.student_id,
          course_id: courseId},
      })
         navigate("/Current_courses")
@@ -73,7 +73,7 @@ export default function WriteReviews(props) {
             </select>
             <p> You got a {props.grade} in this class!</p>
 
-            <h1><button onClick = {() => next(location.state.course_id, fullDate, props.rating )} >Add Review</button></h1>
+            <h1><button onClick = {() => next(location.state.course_id, fullDate, props.rating, props.grade)} >Add Review</button></h1>
 
 
 

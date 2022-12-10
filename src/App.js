@@ -64,7 +64,6 @@ const getAllReviews = () => {
     };
 
 
-
 useEffect(() => {
     getAvailableCourses();
 }, [student.student_id, subname]);
