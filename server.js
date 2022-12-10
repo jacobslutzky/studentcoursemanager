@@ -54,8 +54,19 @@ app.get('/createdb', (req, res) => {
 app.get('/create_student_info_table', (req, res) => {
     db.query("CREATE TABLE student_information (student_id int primary key NOT NULL AUTO_INCREMENT, name VARCHAR(100), major VARCHAR(100), year VARCHAR(100),password VARCHAR(100))", (err,result) => {
         if(err) throw err;
-        console.log(result);
-        res.send("table created...")
+        else{
+            console.log(result);
+            //res.send("table created...")
+            db.query("CREATE INDEX stu_id USING hash ON student_information(student_id)", (err, result) => {
+                if (err) throw err;
+                else{
+                    console.log(result);
+                    res.send("table and index created...")
+                }
+            });
+        }
+        
+    
     });
 });
 // app.get('/create_gpa_info_table', (req, res) => {
@@ -97,16 +108,6 @@ app.get('/create_teacher_table', (req, res) => {
     });
 });
 
-
-
-
-app.get('/createstudentinfotable', (req, res) => {
-    db.query("CREATE TABLE student_information (student_id int primary key NOT NULL AUTO_INCREMENT, name VARCHAR(100), major VARCHAR(100), year VARCHAR(100),password VARCHAR(100))", (err,result) => {
-        if(err) throw err;
-        console.log(result);
-        res.send("Database created...")
-    });
-});
 
 
 app.get('/delete', (req, res) => {
