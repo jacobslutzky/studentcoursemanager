@@ -7,6 +7,7 @@ import { useNavigate } from "react-router";
 export default function Summary(props) {
     let navigate = useNavigate();
     const [data, setData] = useState([]);
+    const [gpa, setGPA] = useState([]);
 
     
     useEffect(() => {
@@ -16,6 +17,12 @@ export default function Summary(props) {
           .catch(err => console.log(err));
       }, []);
     
+    useEffect(() => {
+    axios.post("http://localhost:3000/get_gpa", { student_id: props.student.student_id
+        })
+        .then(res => setGPA(res.data))
+        .catch(err => console.log(err));
+    }, []);
     
     const back = () => {
         navigate("/welcome")

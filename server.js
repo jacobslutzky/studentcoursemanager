@@ -39,7 +39,7 @@ app.use((req, res, next) => {
 const db = mysql.createConnection({
     host: '127.0.0.1', //localhost
     user: "root", //root
-    password: "", //password
+    password: "password", //password
     database: "StudentCourseManager"
   });
 
@@ -79,8 +79,17 @@ app.get('/create_student_info_table', (req, res) => {
 app.get('/create_gradebook', (req, res) => {
     db.query("CREATE TABLE gradebook (student_id int , course_id VARCHAR(100), final_grade numeric, primary key(student_id,course_id))", (err,result) => {
         if(err) throw err;
-        console.log(result);
-        res.send("table created...")
+        else{ 
+            console.log(result);
+            db.query("CREATE UNIQUE INDEX course USING BTREE ON gradebook(student_id, course_id)", (err,result) => {
+                if (err) throw err;
+                else {
+                    console.log(result);
+                    res.send("gradebook table and index created...")
+                }
+            });
+
+        }
     });
 });
 
