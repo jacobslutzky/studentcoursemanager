@@ -17,6 +17,7 @@ function App() {
 
 const [student, setStudent] = useState("");
 const [subname, setsubname] = useState("");
+const [minRating, setMinRating] = useState("");
 const [Review, setReview] = useState("");
 const [rating, setRating] = useState("");
 const [grade, setGrade] = useState("");
@@ -26,7 +27,7 @@ const [allReviews, setAllReviews] = useState("");
     //axios.post("http://localhost:3000/get_available_courses"
 
 //}
- 
+
 
 const [course_id, setCourseID] = useState("");
 const [available_courses, setAvailableCourses] = useState("");
@@ -39,6 +40,13 @@ const getAvailableCourses = () => {
 });
 };
 
+const getAllReviews = () => {
+    axios.post("http://localhost:3000/get_all_reviews", {minRating: minRating})
+      .then(res => setAllReviews(res.data))
+      .catch(err => console.log(err));
+  }
+
+
 const getCurrCourses = () => {
 console.log(student)
     axios.post("http://localhost:3000/get_curr_courses",{
@@ -48,25 +56,24 @@ console.log(student)
 });
 };
 
-const getSelectedCourse = () => {
-    console.log(student)
-    axios.post("http://localhost:3000/get_curr_courses",{
-        student_id: student.student_id }).then((res) => {
-        console.log(res.data)
-        setCurrCourses(res.data);
-});
-};
+// const getSelectedCourse = () => {
+//     console.log(student)
+//     axios.post("http://localhost:3000/get_curr_courses",{
+//         student_id: student.student_id }).then((res) => {
+//         console.log(res.data)
+//         setCurrCourses(res.data);
+// });
+// };
 
-const getAllReviews = () => {
-    axios.post("http://localhost:3000/get_all_reviews",{
-         }).then((res) => {
-    });
-    };
 
 
 useEffect(() => {
     getAvailableCourses();
 }, [student.student_id, subname]);
+
+useEffect(() => {
+    getAllReviews();
+  }, [minRating]);
 
 useEffect(() => {
     getCurrCourses();
@@ -83,7 +90,7 @@ return (
         <Route path="/Current_courses" element = {<Current_courses curr_courses={curr_courses} setCurrCourses={setCurrCourses} getAvailableCourses = {getAvailableCourses} student_id = {student.student_id} getCurrCourses = {getCurrCourses}/>}/>
         <Route path="/Scheduling_Assistant" element = {<Scheduling_assistant student={student} setStudent={setStudent} course_id={course_id} setCourseID={setCourseID} available_courses={available_courses} setAvailableCourses={setAvailableCourses} getAvailableCourses={getAvailableCourses} setsubname = {setsubname} subname = {subname} getCurrCourses = {getCurrCourses} />}/>
         <Route path="/WriteReviews" element = {<WriteReviews curr_courses={curr_courses} setCurrCourses={setCurrCourses} getAvailableCourses = {getAvailableCourses} student_id = {student.student_id} getCurrCourses = {getCurrCourses} setReview = {setReview} Review = {Review} setRating = {setRating} rating = {rating} setGrade = {setGrade} grade = {grade} />}/>
-        <Route path="/Reviews" element = {<CheckReviews setAllReviews = {setAllReviews} allReviews = {allReviews}  curr_courses={curr_courses} setCurrCourses={setCurrCourses} getAvailableCourses = {getAvailableCourses} student_id = {student.student_id} getCurrCourses = {getCurrCourses} setReview = {setReview} Review = {Review} setRating = {setRating} rating = {rating} setGrade = {setGrade} grade = {grade} />}/>
+        <Route path="/Reviews" element = {<CheckReviews setAllReviews = {setAllReviews} allReviews = {allReviews}  getAllReviews = {getAllReviews} minRating = {minRating} setMinRating = {setMinRating}/>}/>
         </Routes>
         
     </Router> 

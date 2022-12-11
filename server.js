@@ -94,7 +94,7 @@ app.get('/create_course_table', (req, res) => {
 
 
 app.get('/create_review_table', (req, res) => {
-    db.query("CREATE TABLE reviews (course_id VARCHAR(100) primary key, date VARCHAR(1000), rating numeric)", (err,result) => {
+    db.query("CREATE TABLE reviews (course_id VARCHAR(100) primary key, student_id int primary key, date VARCHAR(1000), rating numeric)", (err,result) => {
         if(err) throw err;
         console.log(result);
         res.send("table created...")
@@ -241,7 +241,8 @@ app.post("/get_selected_course", (req, res) => {
 
 app.post("/get_all_reviews", (req, res) => {
     db.query(
-        "select * from reviews",
+        "select * from reviews r join student_information s on s.student_id = r.student_id join courses c on c.course_id = r.course_id where r.rating >= ?",
+        [req.body.minRating],
         (err, result) => {
             if (err) {
                 console.log(err);
@@ -255,12 +256,13 @@ app.post("/get_all_reviews", (req, res) => {
 })
 
 app.post("/add_review", (req, res) => {
-        const insertQuery = "INSERT INTO reviews (course_id, date, rating) VALUES (?,?,?)";
+        const insertQuery = "INSERT INTO reviews (course_id, student_id, date, rating) VALUES (?,?, ?,?) on DUPLICATE KEY UPDATE date = ?, rating = ?";
         const course_id = req.body.data.course_id;
+        const student_id = req.body.data.student_id;
         const date = req.body.data.date;
         const rating = req.body.data.rating;
         console.log(date)
-        db.query(insertQuery, [course_id, date, rating], (err, result) => {
+        db.query(insertQuery, [course_id,student_id, date, rating, date, rating], (err, result) => {
             if (err) {
                 console.log(err);
                 } else {
@@ -272,7 +274,7 @@ app.post("/add_review", (req, res) => {
 
 app.post("/get_curr_courses", (req, res) => {
     db.query(
-        "select * from gradebook where student_id = ? and final_grade is null",
+        "select * from gradebook g join courses c on g.course_id = c.course_id where student_id = ? and final_grade is null",
         [req.body.student_id],
         (err, result) => {
         if (err) {
@@ -287,11 +289,12 @@ app.post("/get_curr_courses", (req, res) => {
 
 
 app.post("/add_course", (req, res) => {
-    const insertQuery = "INSERT INTO gradebook (student_id, course_id, final_grade) VALUES (?,?, NULL)";
+    const insertQuery = "INSERT INTO gradebook (student_id, course_id, final_grade) VALUES (?,?, NULL) ON DUPLICATE KEY UPDATE final_grade = NULL";
     const student_id = req.body.student_id;
     const course_id = req.body.course_id;
     db.query(insertQuery, [student_id, course_id], (err, result) => {
         if (err) {
+        
         console.log(err);
         } else {
         res.send(result);
@@ -328,7 +331,7 @@ app.post("/finish_course", (req, res) => {
     });
 });
 app.post("/finished_courses", (req, res) => {
-    const getQuery = "select * from gradebook where final_grade is not null and student_id = ?";
+    const getQuery = "select * from gradebook g join courses c on c.course_id = g.course_id where final_grade is not null and student_id = ?";
     console.log(req.params, req.body)
     const student_id = req.body.student_id;
     db.query(getQuery, [student_id], (err, result) => {
