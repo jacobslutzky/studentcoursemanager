@@ -7,7 +7,6 @@ import { useNavigate } from "react-router";
 export default function Summary(props) {
     let navigate = useNavigate();
     const [data, setData] = useState([]);
-    const [gpa, setGPA] = useState([]);
 
     
     useEffect(() => {
@@ -17,12 +16,7 @@ export default function Summary(props) {
           .catch(err => console.log(err));
       }, []);
     
-    useEffect(() => {
-    axios.post("http://localhost:3000/get_gpa", { student_id: props.student.student_id
-        })
-        .then(res => setGPA(res.data))
-        .catch(err => console.log(err));
-    }, []);
+ 
     
     const back = () => {
         navigate("/welcome")
@@ -32,8 +26,10 @@ export default function Summary(props) {
         <h1><b>Transcript</b></h1> 
         <h3> Name: {props.student.name} </h3> 
         <h3>Student ID: {props.student.student_id} </h3> 
-        <h3>GPA: </h3>
-        <h3>Credits: </h3>
+        <h3>{props.standing} </h3>
+        <h3>GPA: {props.gpa}</h3>
+        <h3>Credits: {props.credits}</h3>
+        <h3>Class: {props.classStanding}</h3>
         <h3>Completed Courses:</h3>
         {data.map((val, key) => {
             return(

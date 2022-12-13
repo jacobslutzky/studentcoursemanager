@@ -8,6 +8,8 @@ export default function Welcome(props) {
     let navigate = useNavigate();
 
     const summary = () => {
+        props.getGPA()
+        props.getCredits()
         navigate("/summary")
     }
 
@@ -19,6 +21,8 @@ export default function Welcome(props) {
         navigate("/scheduling_assistant")
     }
     const reviewpage = () => {
+        props.setMinRating(1)
+        props.getAllReviews()
         navigate("/Reviews")
     }
 

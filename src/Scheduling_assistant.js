@@ -35,7 +35,8 @@ export default function Scheduling_Assistant(props) {
     return (
        <div key = {item.course_id} className="courseinfo">
           <h3>Course Number: {item.course_id}</h3>
-          <h3>Course Name: {item.name}</h3>
+          <h3>Course Name: {item.course_name}</h3>
+          <h3>Teacher: {item.teacher}</h3>
           
           <button onClick = {() => add_course(item.course_id)} >Add Course</button>
        </div>
