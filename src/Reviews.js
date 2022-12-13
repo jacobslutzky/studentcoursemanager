@@ -9,8 +9,7 @@ export default function CheckReviews(props) {
     const back = () => {
         navigate("/welcome")
     }
-
-    props.getAllReviews()
+    
 
 
       return (
@@ -20,12 +19,13 @@ export default function CheckReviews(props) {
         <input type = "text" 
         onChange={(e) => {props.setMinRating(e.target.value)}}/>
 
-        {props.allReviews.map((val, key) => {
+        {props.allReviews.map((element, index) => {
       return(
-          <div key = {val.course_id}>
-              <h1>{"CourseID: " + val.course_id}</h1>
-              <h3>{"Date: " + val.date}</h3>
-              <h4>{"Rating: " + val.rating} </h4>
+          <div key = {index}>
+              <h1>{"CourseID: " + element.course_id}</h1>
+              <h3>{"Name: "+ element.name}</h3>
+              <h3>{"Date: " + element.date}</h3>
+              <h4>{"Rating: " + element.rating} </h4>
           </div>
       )
     }

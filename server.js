@@ -96,8 +96,16 @@ app.get('/create_gradebook', (req, res) => {
 app.get('/create_course_table', (req, res) => {
     db.query("CREATE TABLE courses (course_id VARCHAR(100) primary key, faculty_id int, name VARCHAR(100), description VARCHAR(100), credits numeric)", (err,result) => {
         if(err) throw err;
-        console.log(result);
-        res.send("table created...")
+        else{ 
+            console.log(result);
+            db.query("CREATE INDEX cid USING BTREE ON course(course_id)", (err,result) => {
+                if (err) throw err;
+                else {
+                    console.log(result);
+                    res.send("course table and index created...")
+                }
+            });
+        }
     });
 });
 
@@ -105,8 +113,16 @@ app.get('/create_course_table', (req, res) => {
 app.get('/create_review_table', (req, res) => {
     db.query("CREATE TABLE reviews (course_id VARCHAR(100) primary key, student_id int primary key, date VARCHAR(1000), rating numeric)", (err,result) => {
         if(err) throw err;
-        console.log(result);
-        res.send("table created...")
+        else {
+            console.log(result);
+            db.query("CREATE INDEX r USING BTREE ON reviews(rating)", (err,result) => {
+                if (err) throw err;
+                else {
+                    console.log(result);
+                    res.send("revoew table and index created...")
+                }
+            });
+        }
     });
 });
 app.get('/create_teacher_table', (req, res) => {
@@ -221,7 +237,7 @@ app.post("/login_student", (req, res) => {
 
 app.post("/get_available_courses", (req, res) => {
         db.query(
-            "select * from courses where course_id not in (select course_id from gradebook where student_id = ? and final_grade is NULL) and course_id LIKE concat(?,'%')",
+            "select c.course_id, c.name as course_name, t.name as teacher from courses c join teacher t on c.faculty_id = t.faculty_id where course_id not in (select course_id from gradebook where student_id = ? and final_grade is NULL) and course_id LIKE concat(?,'%')",
             [req.body.student_id, req.body.course_subname],
             (err, result) => {
             if (err) {
@@ -250,12 +266,12 @@ app.post("/get_selected_course", (req, res) => {
 
 app.post("/get_all_reviews", (req, res) => {
     db.query(
-        "select * from reviews r join student_information s on s.student_id = r.student_id join courses c on c.course_id = r.course_id where r.rating >= ?",
+        "select c.course_id, s.name, r.rating, r.date from reviews r join student_information s on s.student_id = r.student_id join courses c on c.course_id = r.course_id where r.rating >= ?",
         [req.body.minRating],
         (err, result) => {
             if (err) {
                 console.log(err);
-            } else {
+                } else {
                 console.log(result);
                 res.send(result);
             }
@@ -265,6 +281,16 @@ app.post("/get_all_reviews", (req, res) => {
 })
 
 app.post("/add_review", (req, res) => {
+    db.query('SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED');
+    console.log('Finished setting the add review isolation level to read committed');
+
+    db.query("BEGIN", function (err) {
+        console.log('add review transaction has started');
+    
+        if (err) {
+            console.log(err);
+            return;
+        }
         const insertQuery = "INSERT INTO reviews (course_id, student_id, date, rating) VALUES (?,?, ?,?) on DUPLICATE KEY UPDATE date = ?, rating = ?";
         const course_id = req.body.data.course_id;
         const student_id = req.body.data.student_id;
@@ -274,12 +300,28 @@ app.post("/add_review", (req, res) => {
         db.query(insertQuery, [course_id,student_id, date, rating, date, rating], (err, result) => {
             if (err) {
                 console.log(err);
+                db.query('ROLLBACK', function (err) {
+                    if (err) throw err;
+                  });
                 } else {
-                res.send(result);
+                    db.query('COMMIT', function (err, results, fields) {
+                        if (err) throw err;
+                         else{
+                            console.log(' add review  transaction complete');
+
+                             res.send(result);
+                         }
+                        
+                    });
                 }
+                   
+
+                
         });
 
     });
+});
+
 
 app.post("/get_curr_courses", (req, res) => {
     db.query(
@@ -352,19 +394,34 @@ app.post("/finished_courses", (req, res) => {
     });
 });
 
-// app.get("/get_gpa", (req, res) => {
-        // db.query(
-        //     "",
-        //     req.params.student_id,
-        //     (err, result) => {
-        //     if (err) {
-        //         console.log(err);
-        //     } else {
-        //         res.send(result);
-        //     }
-        //     }
-        // );
-        // });
+app.post("/get_gpa", (req, res) => {
+    var SID = req.body.student_id;
+        db.query(
+            "Call get_gpa_and_status(?)",
+            SID,
+            (err, result) => {
+            if (err) {
+                console.log(err);
+            } else {
+                res.send(result);
+            }
+            }
+        );
+        });
 
-
+app.post("/get_credits", (req, res) => {
+    var SID = req.body.student_id
+        db.query(
+            "Call get_credits_and_class_standing(?)",
+            SID,
+            (err, result) => {
+            if (err) {
+                console.log(err);
+            } else {
+                res.send(result);
+            }
+            }
+        );
+        });
+        
 
